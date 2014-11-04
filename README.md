@@ -3,6 +3,12 @@ Craft RSVP Plugin
 
 Craft plugin for simple RSVP on your site - great for wedding sites!
 
+### Notifications
+
+Simple email notifications are built into the plugins settings, I just have not implemented them as of yet.
+
+**(pull requests are _highly_ encouraged and welcomed)**
+
 ### Example Form
 
 ```html
