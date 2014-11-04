@@ -1,0 +1,55 @@
+{% extends "_layouts/cp" %}
+
+{% set title = "Rsvp"|t %}
+{% set rsvps = craft.rsvp.getAllRsvps %}
+
+{% set content %}
+
+    {% if rsvps | length %}
+
+        <table id="rsvps" class="data fullwidth">
+
+            <thead>
+
+                <th scope="col">{{ "Attending"|t }}</th>
+                <th scope="col">{{ "Name"|t }}</th>
+                <th scope="col">{{ "Email"|t }}</th>
+                <th scope="col">{{ "Phone"|t }}</th>
+                <th scope="col">{{ "Guests"|t }}</th>
+                <th class="thin"></th>
+
+            </thead>
+
+            <tbody>
+
+                {% for rsvp in rsvps %}
+
+                    <tr data-id="{{ rsvp.id }}" data-name="{{ rsvp.name|t }}">
+
+                        <td>{{ rsvp.attending|t }}</td>
+                        <td><a href="{{ url('rsvp/'~rsvp.id) }}">{{ rsvp.name }}</a></td>
+                        <td><a href="mailto:{{ rsvp.email }}">{{ rsvp.email }}</a></td>
+                        {% if rsvp.phone is not null %}
+                            <td>{{ rsvp.phone }}</td>
+                        {% else %}
+                            <td>No phone number provided</td>
+                        {% endif %}
+                        <td>{{ rsvp.guests }}</td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    {% else %}
+
+        <p>No RSVPs yet.</p>
+
+    {% endif %}
+
+{% endset %}
+
+{% includeCssFile('resources/rsvp/css/rsvp.css') %}
