@@ -10,7 +10,7 @@ class RsvpPlugin extends BasePlugin
 
 	public function getVersion()
 	{
-		return '1.0';
+		return '1.1';
 	}
 
 	public function getDeveloper()
@@ -20,7 +20,7 @@ class RsvpPlugin extends BasePlugin
 
 	public function getDeveloperUrl()
 	{
-		return 'http://letcoder.com';
+		return 'http://www.letcoder.com';
 	}
 
 	public function hasCpSection()
