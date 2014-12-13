@@ -47,12 +47,12 @@ class RsvpService extends BaseApplicationComponent
 	{
 		$record = new RsvpRecord();
 
-		$record->name       = $model->name;
-		$record->email      = $model->email;
-		$record->phone      = $model->phone;
-		$record->attending  = $model->attending;
-		$record->guests     = $model->guests;
-		$record->comments 	= $model->comments;
+		$record->name		= $model->name;
+		$record->email		= $model->email;
+		$record->phone		= $model->phone;
+		$record->attending	= $model->attending;
+		$record->guests		= $model->guests;
+		$record->comments	= $model->comments;
 
 		$record->validate();
 
