@@ -13,9 +13,4 @@ class RsvpVariable
         return craft()->rsvp->getAllRsvps();
     }
 
-    public function getTotalAttendees()
-    {
-        return craft()->rsvp->getTotalAttendees();
-    }
-
 }
