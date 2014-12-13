@@ -47,12 +47,12 @@ class RsvpService extends BaseApplicationComponent
 	{
 		$record = new RsvpRecord();
 
-		$record->name       = $model->name;
-		$record->email      = $model->email;
-		$record->phone      = $model->phone;
-		$record->attending  = $model->attending;
-		$record->guests     = $model->guests;
-		$record->comments 	= $model->comments;
+		$record->name		= $model->name;
+		$record->email		= $model->email;
+		$record->phone		= $model->phone;
+		$record->attending	= $model->attending;
+		$record->guests		= $model->guests;
+		$record->comments	= $model->comments;
 
 		$record->validate();
 
@@ -73,7 +73,6 @@ class RsvpService extends BaseApplicationComponent
 				$transaction->commit();
 			}
 
-
 			else
 			{
 				return false;
@@ -90,26 +89,25 @@ class RsvpService extends BaseApplicationComponent
 			throw $e;
 		}
 
-		return true;
-	}
-
-	public function onSave(Event $event)
-	{
-		$this->raiseEvent('onSave', $event);
-
 		$settings = craft()->plugins->getPlugin('rsvp')->getSettings();
 
-		if (!empty($settings->notificationEmail)) {
-
+		// fire off email notification
+		if (!empty($settings->notificationEmail))
+		{
 			$email = new EmailModel();
 			$email->toEmail = $settings->notificationEmail;
 			$email->subject = $settings->notificationSubject;
 			$email->body    = $settings->notificationMessage;
 
 			craft()->email->sendEmail($email);
-
-			// add another if statement for confirmation email
 		}
+
+		return true;
+	}
+
+	public function onSave(Event $event)
+	{
+		$this->raiseEvent('onSave', $event);
 	}
 
 }
