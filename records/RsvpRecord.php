@@ -12,37 +12,36 @@ class RsvpRecord extends BaseRecord
     {
         return array(
             'name' => array(
-                AttributeType::String,
-                'required' => true
+                AttributeType::String
             ),
             'email' => array(
-                AttributeType::String,
-                'required' => true
+                AttributeType::String
             ),
             'phone' => array(
-                AttributeType::String,
-                'required' => true
+                AttributeType::String
             ),
             'attending' => array(
-                AttributeType::String,
-                'required' => true
+                AttributeType::String
             ),
             'guests' => array(
-                AttributeType::Number,
-                'required' => true
+                AttributeType::Number
             ),
             'comments' => array(
-                AttributeType::String,
-                'required' => true
+                AttributeType::String
             ),
         );
     }
 
+    /**
+     * Create a new instance of the current class. This allows us to
+     * properly unit test our service layer.
+     *
+     * @return BaseRecord
+     */
     public function create()
     {
         $class = get_class($this);
         $record = new $class();
-
         return $record;
     }
 }

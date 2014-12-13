@@ -4,64 +4,106 @@ namespace Craft;
 class RsvpController extends BaseController
 {
 
-    private $rsvp;
-    private $plugin;
+	private $rsvp;
+	private $plugin;
 
-    protected $allowAnonymous = array('actionSubmit');
+	protected $allowAnonymous = array('actionSubmit');
 
-    public function init()
-    {
-        $this->plugin = craft()->plugins->getPlugin('rsvp');
+	public function init()
+	{
+		$this->plugin = craft()->plugins->getPlugin('rsvp');
 
-        if (!$this->plugin)
+		if (!$this->plugin)
+		{
+			throw new Exception("Couldn't find the Rsvp plugin!");
+		}
+	}
+
+	public function actionIndex()
+	{
+
+		// get all rsvps from service
+		$variables['rsvps'] = craft()->rsvp->getAllRsvps();
+
+		// render template with variables
+		$this->renderTemplate('rsvp/index', $variables);
+	}
+
+	public function actionView(array $variables = array())
+	{
+		if (!empty($variables['rsvpId']))
+		{
+			$variables['rsvp'] = craft()->rsvp->getRsvpById($variables['rsvpId']);
+		}
+
+		$this->renderTemplate('rsvp/view', $variables);
+
+
+	}
+
+	public function actionSubmit()
+	{
+		// require post
+		$this->requirePostRequest();
+
+		$errors = array();
+
+		// make a new rsvp
+		$model = new RsvpModel();
+
+		// assign the attributes from the post to the model
+		$model->name      = craft()->request->getPost('name');
+		$model->email     = craft()->request->getPost('email');
+		$model->phone     = craft()->request->getPost('phone');
+		$model->guests    = craft()->request->getPost('guests');
+		$model->attending = craft()->request->getPost('attending');
+		$model->comments  = craft()->request->getPost('comments');
+
+		// validate
+		if ($model->validate())
         {
-            throw new Exception("Couldn't find the Rsvp plugin!");
-        }
-    }
+//            Craft::dd($model);
 
-    public function actionIndex()
-    {
+			// save it!
+			craft()->rsvp->saveRsvp($model);
 
-        // get all rsvps from service
-        $variables['rsvps'] = craft()->rsvp->getAllRsvps();
+			// redirect to posted URL
+			return $this->redirectToPostedUrl($variables = array());
+		}
 
-        // render template with variables
-        $this->renderTemplate('rsvp/index', $variables);
-    }
+		else
+		{
 
-    public function actionView(array $variables = array())
-    {
-        if (!empty($variables['rsvpId']))
-        {
-            $variables['rsvp'] = craft()->rsvp->getRsvpById($variables['rsvpId']);
-        }
+			if ($model->getError('name'))
+            {
+				$errors['name'] = 'Name is required';
+			}
 
-        // Craft::dd($variables);
+			if ($model->getError('email'))
+            {
+				$errors['email'] = 'Email address is required';
+			}
 
-        $this->renderTemplate('rsvp/view', $variables);
+			if ($model->getError('phone'))
+            {
+				$errors['phone'] = 'Phone number is required';
+			}
 
+			if ($model->getError('guests'))
+            {
+				$errors['guests'] = 'Number of guests is required';
+			}
 
-    }
+			// Send the data back to the template
+			craft()->urlManager->setRouteVariables(array(
+				'errors'	=> $errors,
+				'name'		=> $model->name,
+				'email'		=> $model->email,
+				'phone'		=> $model->phone,
+				'guests'	=> $model->guests,
+			));
 
-    public function actionSubmit()
-    {
-        // require post
-        $this->requirePostRequest();
+		}
 
-        // make a new rsvp
-        $rsvp = new RsvpModel();
-
-        // assign the attributes from the post to the model
-        $rsvp->name      = craft()->request->getPost('name');
-        $rsvp->email     = craft()->request->getPost('email');
-        $rsvp->phone     = craft()->request->getPost('phone');
-        $rsvp->guests    = craft()->request->getPost('guests');
-        $rsvp->attending = craft()->request->getPost('attending');
-        $rsvp->comments  = craft()->request->getPost('comments');
-
-        // Save it!
-        craft()->rsvp->saveRsvp($rsvp);
-
-        return $this->redirectToPostedUrl($variables = array());
-    }
+	}
 }
