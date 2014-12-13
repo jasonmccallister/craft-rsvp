@@ -3,106 +3,113 @@ namespace Craft;
 
 class RsvpService extends BaseApplicationComponent
 {
-    protected $rsvpRecord;
-    protected $_rsvpById;
+	protected $rsvpRecord;
+	protected $_rsvpById;
+	protected $rsvp;
 
-    public function init($rsvpRecord = null)
-    {
-        $this->rsvpRecord = $rsvpRecord;
-        if (is_null($this->rsvpRecord)) {
-            $this->rsvpRecord = RsvpRecord::model();
-        }
-    }
+	public function init($rsvpRecord = null)
+	{
+		$this->rsvpRecord = $rsvpRecord;
 
-    public function getAllRsvps($indexBy = null)
-    {
-        $rsvps = RsvpRecord::model()->findAll();
+		if (is_null($this->rsvpRecord))
+		{
+			$this->rsvpRecord = RsvpRecord::model();
+		}
+	}
 
-        return $rsvps;
-    }
+	public function getAllRsvps($indexBy = null)
+	{
+		$rsvps = RsvpRecord::model()->findAll();
 
-    public function getRsvpById($rsvpId)
-    {
-        if (!isset($this->_rsvpById) || !array_key_exists($irsvpIdd, $this->_rsvpById))
-        {
-            $rsvpRecord = RsvpRecord::model()->findById($rsvpId);
+		return $rsvps;
+	}
 
-            if ($rsvpRecord)
-            {
-                $this->_rsvpById[$rsvpId] = RsvpModel::populateModel($rsvpRecord);
-            }
-            else
-            {
-                $this->_rsvpById[$rsvpId] = null;
-            }
-        }
+	public function getRsvpById($rsvpId)
+	{
+		if (!isset($this->_rsvpById) || !array_key_exists($irsvpIdd, $this->_rsvpById))
+		{
+			$rsvpRecord = RsvpRecord::model()->findById($rsvpId);
 
-        return $this->_rsvpById[$rsvpId];
-    }
+			if ($rsvpRecord)
+			{
+				$this->_rsvpById[$rsvpId] = RsvpModel::populateModel($rsvpRecord);
+			}
+			else
+			{
+				$this->_rsvpById[$rsvpId] = null;
+			}
+		}
 
-    public function saveRsvp(RsvpModel $model)
-    {
+		return $this->_rsvpById[$rsvpId];
+	}
 
-        $record = $this->rsvpRecord->create();
+	public function saveRsvp(RsvpModel $model)
+	{
+		$record = new RsvpRecord();
 
-        $record->setAttributes($model->getAttributes());
+		$record->name       = $model->name;
+		$record->email      = $model->email;
+		$record->phone      = $model->phone;
+		$record->attending  = $model->attending;
+		$record->guests     = $model->guests;
+		$record->comments 	= $model->comments;
 
-        if($record->save())
-        {
-            return true;
-        }
-        else
-        {
-            $model->addErrors($record->getErrors());
+		$record->validate();
 
-            return false;
-        }
-    }
+		$model->addErrors($record->getErrors());
 
-    public function onSave(Event $event)
-    {
-        $this->raiseEvent('onSave', $event);
+		if ($model->hasErrors())
+		{
+			return false;
+		}
 
-        $settings = craft()->plugins->getPlugin('rsvp')->getSettings();
+		$transaction = craft()->db->getCurrentTransaction() === null ? craft()->db->beginTransaction() : null;
+		try
+		{
+			$record->save(false);
 
-        if (!empty($settings->notificationEmail)) {
+			if ($transaction !== null)
+			{
+				$transaction->commit();
+			}
 
-            $email = new EmailModel();
-            $email->toEmail = $settings->notificationEmail;
-            $email->subject = $settings->notificationSubject;
-            $email->body    = $settings->notificationMessage;
 
-            craft()->email->sendEmail($email);
+			else
+			{
+				return false;
+			}
+		}
 
-            // add another if statement for confirmation email
-        }
-    }
+		catch (\Exception $e)
+		{
+			if ($transaction !== null)
+			{
+				$transaction->rollback();
+			}
 
-    // public function getTotalAttendees()
-    // {
-    //     // $records = $this->rsvpRecord->findAll(array(
-    //     //     'attending' => 'Yes'
-    //     // ));
-    //
-    //     $query = craft()->db->createCommand()
-    //         // ->select('guests, attending')
-    //         ->select('attending, guests')
-    //         ->from('rsvps')
-    //         // ->where('attending = ' . 'attending')
-    //         ->where('attending=:attending', array(
-    //             ':attending'=>'Yes'
-    //         ))
-    //         // ->where('attending=:attending', array(
-    //         //     ':attending'=> 'Yes'
-    //         // ))
-    //         ->queryRow();
-    //
-    //
-    //
-    //     // $total = count ($query);
-    //     $total = count ($query);
-    //
-    //     return $total;
-    // }
+			throw $e;
+		}
+
+		return true;
+	}
+
+	public function onSave(Event $event)
+	{
+		$this->raiseEvent('onSave', $event);
+
+		$settings = craft()->plugins->getPlugin('rsvp')->getSettings();
+
+		if (!empty($settings->notificationEmail)) {
+
+			$email = new EmailModel();
+			$email->toEmail = $settings->notificationEmail;
+			$email->subject = $settings->notificationSubject;
+			$email->body    = $settings->notificationMessage;
+
+			craft()->email->sendEmail($email);
+
+			// add another if statement for confirmation email
+		}
+	}
 
 }
