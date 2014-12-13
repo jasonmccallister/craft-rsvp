@@ -62,8 +62,6 @@ class RsvpController extends BaseController
 		// validate
 		if ($model->validate())
         {
-//            Craft::dd($model);
-
 			// save it!
 			craft()->rsvp->saveRsvp($model);
 
