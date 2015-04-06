@@ -1,0 +1,71 @@
+{% import "_includes/forms" as forms %}
+
+<h2>Notification Email</h2>
+
+{% if settings.notificationEmail is null %}
+    <p style="margin-bottom: 42px"><strong>Note</strong>: You must enter an email address for notifications. If you do not setup your email, you <strong>will not</strong> receive new RSVP notifications.</p>
+{% endif %}
+
+{{ forms.textField({
+    first:        true,
+    label:        "Email"|t,
+    id:           'notificationEmail',
+    name:         'notificationEmail',
+    instructions: "The email address that new application entries will be sent too. Separate multiple email addresses with commas."|t,
+    value:        settings.notificationEmail,
+    autofocus:    true,
+    errors:       settings.getErrors('notificationEmail')
+}) }}
+
+{{ forms.textField({
+    first:        true,
+    label:        "Subject"|t,
+    id:           'notificationSubject',
+    name:         'notificationSubject',
+    instructions: "The email subject line that new application entries will be sent with."|t,
+    value:        settings.notificationSubject,
+    errors:       settings.getErrors('notificationSubject')
+}) }}
+
+{{ forms.textAreaField({
+    label:        "Message"|t,
+    id:           'notificationMessage',
+    name:         'notificationMessage',
+    instructions: "The message content that will be sent in the notification email."|t,
+    value:        settings.notificationMessage,
+    rows:         '4',
+    errors:       settings.getErrors('notificationMessage')
+}) }}
+
+<hr>
+
+<h2>Confirmation Emails</h2>
+
+<p>
+Send email confirmation to guest?
+</p>
+
+{{ forms.lightswitch({
+    id: 'sendConfirmationEmail',
+    name: 'sendConfirmationEmail',
+    on: settings.sendConfirmationEmail,
+}) }}
+
+{{ forms.textField({
+    label:        "Subject"|t,
+    id:           'confirmationSubject',
+    name:         'confirmationSubject',
+    instructions: "The email subject line that will be sent to confirm the guests RSVP"|t,
+    value:        settings.confirmationSubject,
+    errors:       settings.getErrors('confirmationSubject')
+}) }}
+
+{{ forms.textAreaField({
+    label:        "Message"|t,
+    id:           'confirmationMessage',
+    name:         'confirmationMessage',
+    instructions: "The message content that will be sent in the confirmation email."|t,
+    value:        settings.confirmationMessage,
+    rows:         '4',
+    errors:       settings.getErrors('confirmationMessage')
+}) }}
